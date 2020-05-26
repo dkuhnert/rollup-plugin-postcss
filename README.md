@@ -144,10 +144,25 @@ Enable CSS modules or set options for `postcss-modules`.
 
 ### autoModules
 
-Type: `boolean`<br>
-Default: `true`
+Type: `boolean` `function`<br>
+Default: `true`  
+Function: `function(id: string): object|boolean|undefined`  
 
 Automatically enable CSS modules for `.module.css` `.module.sss` `.module.scss` `.module.sass` `.module.styl` `.module.stylus` `.module.less` files.
+
+You can supply a function to control which files CSS modules are enabled and also allows to return the modules options to be used:
+
+```js
+autoModules(id) {
+    if (/\.module\.[a-z]{2,6}$/.test(id)) {
+        return {
+            generateScopedName: '[name]_[local]__[hash:base64:5]',
+            hashPrefix: "test",
+        };
+    }
+    return undefined;
+}
+```
 
 ### namedExports
 

@@ -70,7 +70,10 @@ export default {
     const shouldInject = options.inject
 
     const modulesExported = {}
-    const autoModules = options.autoModules !== false && isModuleFile(this.id)
+    const autoModules = typeof options.autoModules === "function"
+      ? options.autoModules(this.id)
+      : options.autoModules !== false && isModuleFile(this.id)
+    const modules = typeof autoModules === "object" ? autoModules : options.modules
     const supportModules = options.modules || autoModules
     if (supportModules) {
       plugins.unshift(
@@ -80,14 +83,14 @@ export default {
           generateScopedName: process.env.ROLLUP_POSTCSS_TEST ?
             '[name]_[local]' :
             '[name]_[local]__[hash:base64:5]',
-          ...options.modules,
+          ...modules,
           getJSON(filepath, json, outpath) {
             modulesExported[filepath] = json
             if (
-              typeof options.modules === 'object' &&
-              typeof options.modules.getJSON === 'function'
+              typeof modules === 'object' &&
+              typeof modules.getJSON === 'function'
             ) {
-              return options.modules.getJSON(filepath, json, outpath)
+              return modules.getJSON(filepath, json, outpath)
             }
           }
         })
